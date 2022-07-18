@@ -32,7 +32,7 @@ class ToDoTableViewController: UITableViewController {
     }
 
     // MARK: - Table view data source
-
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         return 1 // this is not listed in the directions
@@ -58,6 +58,23 @@ class ToDoTableViewController: UITableViewController {
         return cell
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let addVC = segue.destination as? AddToDoViewController{
+            addVC.previousVC = self 
+        }
+        
+        if let completeVC = segue.destination as? CompleteToDoViewController{
+            if let toDo = sender as? ToDo{
+                completeVC.selectedToDo = toDo
+                completeVC.previousVC = self 
+            }
+        }
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let toDo = toDos[indexPath.row]
+        performSegue(withIdentifier: "moveToComplete", sender: toDo)
+    }
 
     /*
     // Override to support conditional editing of the table view.
