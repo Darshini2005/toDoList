@@ -9,73 +9,91 @@ import UIKit
 
 class ToDoTableViewController: UITableViewController {
 
-    var toDos : [ToDo] = [] // creates an empty arrray of the class that we made
+    //var toDos : [ToDo] = []//creates an empty array of the class that we made
+    var toDos : [ToDoCD] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        toDos = createToDos()
+        //toDos = createToDos()
+        getToDos()
 
+    }//view did load ends
+    
+    override func viewWillAppear(_ animated: Bool) {
+        getToDos()
     }
-    // hi yygufutdiytrsreagertjy
-    /// VIEW DID LOAD ENDS
+    
+    func getToDos(){
+        if let context = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer.viewContext{
+            if let coreDataToDos = try? context.fetch(ToDoCD.fetchRequest()) as? [ToDoCD]{
+                    toDos = coreDataToDos
+                    tableView.reloadData()
+            }
+        }
+        
+    }//end of getToDos
+    
     func createToDos() -> [ToDo]{
         let crime = ToDo()
-        crime.name = " steal a linkedIn cookie"
-        crime.important = true
+        crime.name = "steal a linkedIn cookie"
         
         let dog = ToDo()
-        dog.name = "sneak a dog inside"
-        dog.important = true
+        dog.name = "Sneak a dog onto campus"
+        dog.important = false
         
-        return[crime, dog]
         
-    }
+        return [crime,dog]
+    }//end of create
 
     // MARK: - Table view data source
-    
+
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 1 // this is not listed in the directions
+        return 1 //not in directions!!!!!
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return toDos.count // makes the numner of rows = to the number of items in my array
+        return toDos.count//makes the number of rows  = to the number of items in my array
     }
 
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "reuseIdentifier", for: indexPath)
 
-        // Configure the cell...
         let toDo = toDos[indexPath.row]
-        if toDo.important {
-            cell.textLabel?.text = "🤌" + toDo.name
-        }else{
-            cell.textLabel?.text = toDo.name
-        }
         
-        return cell
+        
+        if let name = toDo.name{
+            if toDo.important{
+                cell.textLabel?.text = "🍪" + name
+            }else{
+                cell.textLabel?.text = name
+            }//creating the cell that we print out
+            
+            
     }
+        return cell
+    }//end of tableView
+    
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if let addVC = segue.destination as? AddToDoViewController{
-            addVC.previousVC = self 
+        if let addVC  = segue.destination as? AddToDoViewController {
+            addVC.previousVC = self
         }
         
-        if let completeVC = segue.destination as? CompleteToDoViewController{
-            if let toDo = sender as? ToDo{
+        if let completeVC = segue.destination as? CompleteToDoViewController {
+            if let toDo = sender as? ToDoCD{
                 completeVC.selectedToDo = toDo
-                completeVC.previousVC = self 
+                completeVC.previousVC = self
             }
         }
-    }
+    }//end of prepare
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let toDo = toDos[indexPath.row]
         performSegue(withIdentifier: "moveToComplete", sender: toDo)
     }
-
     /*
     // Override to support conditional editing of the table view.
     override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
@@ -92,7 +110,7 @@ class ToDoTableViewController: UITableViewController {
             tableView.deleteRows(at: [indexPath], with: .fade)
         } else if editingStyle == .insert {
             // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+        }
     }
     */
 
@@ -121,4 +139,5 @@ class ToDoTableViewController: UITableViewController {
     }
     */
 
-}
+    }//end of class
+
